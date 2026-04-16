@@ -7,28 +7,38 @@ import { fileURLToPath } from "url";
 const app = express();
 const PORT = 3000;
 
-// ES Modules fix
+// -------------------------------------------------
+// Adaptación para ES Modules (non existe __dirname)
+// -------------------------------------------------
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middlewares base
-app.use(cors());
-app.use(express.json());
+// -------------------------------------------------
+// Middlewares básicos
+// -------------------------------------------------
+app.use(cors());          // permite peticións desde o frontend
+app.use(express.json());  // permite recibir JSON no body
 
-// json-server
+// -------------------------------------------------
+// json-server: crea a API a partir de db.json
+// -------------------------------------------------
 const router = jsonServer.router(
   path.join(__dirname, "db/db.json")
 );
 
 const middlewares = jsonServer.defaults();
 
-// usar middlewares correctamente
+// middlewares propios de json-server (logger, etc.)
 app.use(middlewares);
 
-// montar API
+// -------------------------------------------------
+// Prefixo /api → simula unha API real
+// -------------------------------------------------
 app.use("/api", router);
 
-// arranque
+// -------------------------------------------------
+// Arranque do servidor
+// -------------------------------------------------
 app.listen(PORT, () => {
   console.log(`API simulada en http://localhost:${PORT}`);
 });
