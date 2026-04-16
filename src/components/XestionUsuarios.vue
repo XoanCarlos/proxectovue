@@ -111,19 +111,20 @@
     <p v-else>Non hai usuarios cargados.</p>
   </div>
 </template>
-
 <script setup>
 import { ref, reactive, onMounted } from "vue";
-import axios from "axios";
+import {
+  getUsuarios,
+  createUsuario,
+  updateUsuario,
+  deleteUsuario,
+} from "../services/usuarios.service.js";
 import { useUsuarioStore } from "../store/usuarioStore.js";
 
-// Instanciamos a store de usuario
+// Store
 const usuarioStore = useUsuarioStore();
 
-//URL dende .env
-const API_URL = import.meta.env.VITE_API_URL;
-
-const usuarios = ref([]); // Array que se conectará co json-server
+const usuarios = ref([]);
 
 const novoUsuario = reactive({
   dni: "",
@@ -141,30 +142,30 @@ onMounted(() => {
   cargarUsuarios();
 });
 
-// Funcion GARGAR USUARIOS
+// 🔹 Cargar usuarios
 async function cargarUsuarios() {
   try {
-    const res = await axios.get(`${API_URL}/usuarios`);
+    const res = await getUsuarios();
     usuarios.value = res.data;
   } catch (error) {
     console.error("Erro ao cargar usuarios", error);
   }
 }
 
-// CREAR OU MODIFICAR USUARIO
-
+// 🔹 Crear ou actualizar
 async function gardarUsuario() {
   try {
     if (usuarioSeleccionado.value) {
-      await axios.put(`${API_URL}/usuarios/${usuarioSeleccionado.value.id}`, {
+      await updateUsuario(usuarioSeleccionado.value.id, {
         ...novoUsuario,
       });
     } else {
-      await axios.post(`${API_URL}/usuarios`, novoUsuario);
+      await createUsuario(novoUsuario);
     }
 
-    // Actualizamos no Store o estado do usuario seleccionado store ou o novo usuario
-    usuarioStore.seleccionarUsuario(usuarioSeleccionado.value || novoUsuario);
+    usuarioStore.seleccionarUsuario(
+      usuarioSeleccionado.value || novoUsuario
+    );
 
     await cargarUsuarios();
     limparFormulario();
@@ -173,36 +174,39 @@ async function gardarUsuario() {
   }
 }
 
-function eliminarUsuario(index) {
+// 🔹 Eliminar
+async function eliminarUsuario(index) {
   const usuario = usuarios.value[index];
-  axios
-    .delete(`${API_URL}/usuarios/${usuario.id}`)
-    .then(() => {
-      cargarUsuarios();
-      // Se o usuario eliminado era o seleccionado, limpamos o formulario e o Store
-      if (
-        usuarioSeleccionado.value &&
-        usuarioSeleccionado.value.id === usuario.id
-      ) {
-        limparFormulario();
-        usuarioStore.limparUsuario();
-      }
-    })
-    .catch((error) => {
-      console.error("Erro ao eliminar usuario", error);
-    });
+
+  try {
+    await deleteUsuario(usuario.id);
+
+    await cargarUsuarios();
+
+    if (
+      usuarioSeleccionado.value &&
+      usuarioSeleccionado.value.id === usuario.id
+    ) {
+      limparFormulario();
+      usuarioStore.limparUsuario();
+    }
+  } catch (error) {
+    console.error("Erro ao eliminar usuario", error);
+  }
 }
 
+// 🔹 Editar
 function editarUsuario(index) {
   const usuario = usuarios.value[index];
-  Object.assign(novoUsuario, usuario); // Copiamos os datos do usuario ao formulario
-  usuarioSeleccionado.value = usuario; // Marcamos o usuario como seleccionado para editar
-  usuarioStore.seleccionarUsuario(usuario); // Actualizamos o Store co usuario seleccionado
 
-  tarefasUsuario.value = []; // Sen tarefas de exemplo
+  Object.assign(novoUsuario, usuario);
+  usuarioSeleccionado.value = usuario;
+  usuarioStore.seleccionarUsuario(usuario);
+
+  tarefasUsuario.value = [];
 }
 
-// Limpar formulario
+// 🔹 Limpar formulario
 function limparFormulario() {
   novoUsuario.dni = "";
   novoUsuario.nome = "";
@@ -210,6 +214,7 @@ function limparFormulario() {
   novoUsuario.provincia = "";
   novoUsuario.activo = false;
   novoUsuario.tipoCuenta = "";
+
   usuarioSeleccionado.value = null;
   tarefasUsuario.value = [];
 }

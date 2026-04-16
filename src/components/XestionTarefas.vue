@@ -54,105 +54,67 @@
     </table>
   </div>
 </template>
-
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
-import axios from "axios";
+import { ref, watch } from "vue";
 import { useUsuarioStore } from "../store/usuarioStore.js";
 import { useRoute } from "vue-router";
-import { watch } from "vue";
+import {
+  getUsuarioById,
+  getTarefasByUsuario,
+  createTarefa,
+  updateTarefa,
+} from "../services/tarefas.service.js";
 
 const route = useRoute();
-
-const API_URL = import.meta.env.VITE_API_URL;
-// Estes datos virán do store ou das peticións HTTP na UD4
-
-const usuario = ref(null); // Ex: { id: 3, nome: 'María' }
-const tarefas = ref([]);
-
-// Instanciamos a store de usuario
 const usuarioStore = useUsuarioStore();
 
-// Nova tarefa
+const usuario = ref(null);
+const tarefas = ref([]);
+
 const novaTarefa = ref({
   titulo: "",
   dataLimite: "",
 });
 
-// Watch para cargar datos do usuario ao cambiar a ruta
-watch(() => route.params.id,
+// 🔹 Cargar datos ao cambiar a ruta
+watch(
+  () => route.params.id,
   async (idUsuario) => {
     if (!idUsuario) return;
 
     try {
-      // Cargar o usuario
-      const resUsuario = await axios.get(
-        `${API_URL}/usuarios/${idUsuario}`
-      );
+      // Usuario
+      const resUsuario = await getUsuarioById(idUsuario);
 
       usuario.value = {
         id: resUsuario.data.id,
         nome: resUsuario.data.nome,
       };
 
-      // Cargar tarefas do usuario
-      const resTarefas = await axios.get(
-        `${API_URL}/tarefas?usuarioId=${idUsuario}`
-      );
+      // Tarefas
+      const resTarefas = await getTarefasByUsuario(idUsuario);
       tarefas.value = resTarefas.data;
 
     } catch (error) {
       console.error("Erro ao cargar datos", error);
     }
   },
-  // Opcional: cargar inmediatamente ao montar o compoñente
   { immediate: true }
 );
-/*
-// Cargar Tarefas do usuario seleccionado
-onMounted(async () => {
-  // Aquí faríamos unha petición HTTP para obter as tarefas do usuario
-  if (!usuarioStore.id) return;
-  
-  // esto podría facerse ou directamente desde a store ou ben con computed
-  usuario.value = {
-    id: usuarioStore.id,
-    nome: usuarioStore.nome,
-  };
 
-  // Petición HTTP para obter as tarefas do usuario seleccionado
-  try{
-    const res = await axios.get(
-      `${API_URL}/tarefas?usuarioId=${usuario.value.id}`
-    );
-    tarefas.value = res.data;
-  } catch (error) {
-    console.error("Erro ao cargar as tarefas:", error
-    )
-  }
-});
-
-// Limpar datos ao desmontar o compoñente
-  onUnmounted(() => {
-    usuarioStore.limparUsuario();
-    tarefas.value = [];
-  });
-
-*/
-// Crear tarefa (POST máis adiante con axios)
+// 🔹 Crear tarefa
 async function engadirTarefa() {
   try {
-    // Construír obxecto nova tarefa
     const nova = {
       titulo: novaTarefa.value.titulo,
       dataLimite: novaTarefa.value.dataLimite,
       completada: false,
-      usuarioId: usuarioStore.id,
-      usuarioNome: usuarioStore.nome,
+      usuarioId: usuario.value.id,
+      usuarioNome: usuario.value.nome,
     };
-    // Petición POST para gardar a nova tarefa
-    const res = await axios.post(`${API_URL}/tarefas`, nova);
-    // Engadir a tarefa á lista local e cargue a taboa
+
+    const res = await createTarefa(nova);
+
     tarefas.value.push(res.data);
 
     novaTarefa.value.titulo = "";
@@ -162,22 +124,20 @@ async function engadirTarefa() {
   }
 }
 
-// Marcar tarefa como completada (PUT máis adiante)
+// 🔹 Completar tarefa
 async function completarTarefa(index) {
   const tarefa = tarefas.value[index];
 
   try {
-    const res = await axios.patch(
-      `${API_URL}/tarefas/${tarefa.id}`,
-      { completada: true }
-    );
+    const res = await updateTarefa(tarefa.id, {
+      completada: true,
+    });
 
     tarefas.value[index] = res.data;
   } catch (error) {
     console.error("Erro ao actualizar tarefa", error);
   }
 }
-
 </script>
 
 <style scoped>

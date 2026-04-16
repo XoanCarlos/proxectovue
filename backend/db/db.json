@@ -1,0 +1,99 @@
+{
+  "usuarios": [
+    {
+      "dni": "55555555K",
+      "nome": "Margarita Flor Branca",
+      "correo": "branca@mail.com",
+      "provincia": "Lugo",
+      "activo": true,
+      "tipoCuenta": "particular",
+      "id": 1
+    },
+    {
+      "dni": "00000000T",
+      "nome": "Sandalio Botín Descalzo",
+      "correo": "botin@mail.com",
+      "provincia": "Pontevedra",
+      "activo": true,
+      "tipoCuenta": "empresa",
+      "id": 2
+    },
+    {
+      "dni": "22222222D",
+      "nome": "Salvador Abril Santo",
+      "correo": "santo@avi.es",
+      "provincia": "Ourense",
+      "activo": true,
+      "tipoCuenta": "empresa",
+      "id": 3
+    },
+    {
+      "dni": "5555555K",
+      "nome": "Juan",
+      "correo": "solo@gmail.com",
+      "provincia": "A Coruña",
+      "activo": true,
+      "tipoCuenta": "particular",
+      "id": 4
+    },
+    {
+      "dni": "00000000A",
+      "nome": "Luisa",
+      "correo": "luisa@gmail.com",
+      "provincia": "Lugo",
+      "activo": true,
+      "tipoCuenta": "empresa",
+      "id": 5
+    }
+  ],
+  "tarefas": [
+    {
+      "titulo": "Reunión departamento 5 pm",
+      "dataLimite": "2026-01-05",
+      "completada": true,
+      "usuarioId": 1,
+      "usuarioNome": "Margarita Flor Branca",
+      "id": 1
+    },
+    {
+      "titulo": "Preparación de exercicios para SMR",
+      "dataLimite": "2026-01-04",
+      "completada": true,
+      "usuarioId": 1,
+      "usuarioNome": "Margarita Flor Branca",
+      "id": 2
+    },
+    {
+      "titulo": "Reunión avaliación 2º DAM as 4 ",
+      "dataLimite": "2026-01-08",
+      "completada": false,
+      "usuarioId": 1,
+      "usuarioNome": "Margarita Flor Branca",
+      "id": 3
+    },
+    {
+      "titulo": "Control de proyectos DAM",
+      "dataLimite": "2026-03-13",
+      "completada": false,
+      "usuarioId": 2,
+      "usuarioNome": "Sandalio Botín Descalzo",
+      "id": 4
+    },
+    {
+      "titulo": "Reunión Claustro",
+      "dataLimite": "2026-04-15",
+      "completada": false,
+      "usuarioId": 1,
+      "usuarioNome": "Margarita Flor Branca",
+      "id": 5
+    },
+    {
+      "titulo": "Reunión Claustro",
+      "dataLimite": "2026-04-15",
+      "completada": true,
+      "usuarioId": 5,
+      "usuarioNome": "Luisa",
+      "id": 6
+    }
+  ]
+}

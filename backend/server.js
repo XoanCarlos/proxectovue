@@ -1,44 +1,34 @@
-// ----------------------------------
-// Servidor para simular unha API REST con json-server que Inclúe Express para control do servidor 
-// e CORS para permitir peticións desde o frontend (Vite/localhost)
-// ----------------------------------
+import express from "express";
+import cors from "cors";
+import jsonServer from "json-server";
+import path from "path";
+import { fileURLToPath } from "url";
 
-import express from 'express';              // Importamos Express
-import cors from 'cors';                    // Importamos CORS
-import jsonServer from 'json-server';       // Importamos json-server
-import { dirname, join } from 'path';       // Importamos utilidades de path
-import { fileURLToPath } from 'url';        // Importamos fileURLToPath para obter __dirname
+const app = express();
+const PORT = 3000;
 
+// ES Modules fix
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 
-const app = express()                        // Creamos a aplicación Express
-const PORT = 3000                            // Porto no que correrá o servidor
+// Middlewares base
+app.use(cors());
+app.use(express.json());
 
-// ---------------------------------------------------
-// Middlewares
-// ---------------------------------------------------
-app.use(cors())                              // Permite peticións de calquera orixe (CORS) evitando problemas co frontend
+// json-server
+const router = jsonServer.router(
+  path.join(__dirname, "db/db.json")
+);
 
-// Creamos un router de json-server apuntando ao ficheiro db.json
-const router = jsonServer.router(join(__dirname, '..', 'db', 'db.json'))
+const middlewares = jsonServer.defaults();
 
-// Podemos engadir middlewares de json-server se queremos (logs, retrasos, etc.)
-app.use(jsonServer.defaults())               // Middlewares por defecto (logger, static files...)
+// usar middlewares correctamente
+app.use(middlewares);
 
-app.use('/api', router)           // Todas as rutas da API estarán baixo /api  // /api é só o “nome da ruta pública”. 
-                                  // Non ten que coincidir coa estrutura de carpetas do backend, 
-                                  // é máis unha convención para organizar as URLs do teu API.
-                             
+// montar API
+app.use("/api", router);
 
-// GET    http://localhost:3000/api/usuarios
-// POST   http://localhost:3000/api/usuarios
-// PUT    http://localhost:3000/api/usuarios/1
-// DELETE http://localhost:3000/api/usuarios/1
-
-// ---------------------------------------------------
-// Arranque do servidor
-// ---------------------------------------------------
+// arranque
 app.listen(PORT, () => {
-  console.log(`Servidor iniciado en http://localhost:${PORT}`)
-})
+  console.log(`API simulada en http://localhost:${PORT}`);
+});
