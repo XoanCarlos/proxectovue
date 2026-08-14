@@ -1,82 +1,57 @@
 <template>
-  <div class="xestion-usuarios">
-    <h4>👥 Xestión de usuarios</h4>
-    <form @submit.prevent="gardarUsuario">
-      <div class="fila">
-        <div class="campo campo-dni">
-          <label>DNI/CIF:</label>
-          <input
-            v-model="novoUsuario.dni"
-            type="text"
-            required
-            style="text-align: center"
-          />
-        </div>
-        <div class="campo campo-nome">
-          <label>Nome:</label>
-          <input v-model="novoUsuario.nome" type="text" required />
-        </div>
-      </div>
-      <div class="fila">
-        <div class="campo campo-correo">
-          <label>Correo:</label>
-          <input v-model="novoUsuario.correo" type="email" required />
-        </div>
-        <div class="campo campo-provincia">
-          <label>Provincia:</label>
-          <select v-model="novoUsuario.provincia">
-            <option value="">-- Escolle unha provincia --</option>
-            <option>A Coruña</option>
-            <option>Lugo</option>
-            <option>Ourense</option>
-            <option>Pontevedra</option>
-          </select>
-        </div>
-      </div>
-      <div class="fila fila-centrada">
-        <div class="campo inline-activo">
-          <label>Activo:</label>
-          <div class="inline-control">
-            <input v-model="novoUsuario.activo" type="checkbox" />
-            <span>Activo</span>
-          </div>
-        </div>
-        <div class="campo inline-cuenta">
-          <label>Tipo de conta:</label>
-          <div class="inline-control radios">
-            <label>
-              <input
-                v-model="novoUsuario.tipoCuenta"
-                type="radio"
-                value="particular"
-              />
-              <span>Particular</span>
-            </label>
-            <label>
-              <input
-                v-model="novoUsuario.tipoCuenta"
-                type="radio"
-                value="empresa"
-              />
-              <span>Empresa</span>
-            </label>
-          </div>
-        </div>
-      </div>
-      <button
-        type="submit"
-        class="btn-guardar"
-        :disabled="novoUsuario.dni === '' || novoUsuario.nome === ''"
-      >
+  <div class="text-xl font-semibold text-center">
+    <h4 class="mb-4 font-semibold bg-blue-400 text-white">
+    👥 Xestión de usuarios
+</h4>
+
+    <form @submit.prevent="gardarUsuario" class="w-full flex flex-col gap-8 mb-8">
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="flex flex-col gap-2">
+        <label>DNI/CIF:</label>
+        <input type="text" class="border rounded-md px-3 py-2.5">
+    </div>
+    <div class="flex flex-col gap-2">
+        <label>Nome:</label>
+        <input type="text" class="border rounded-md px-3 py-2.5">
+    </div>
+    <div class="flex flex-col gap-2">
+        <label>Correo:</label>
+        <input type="email" class="border rounded-md px-3 py-2.5">
+    </div>
+    <div class="flex flex-col gap-2">
+        <label>Provincia:</label>
+      <select
+    class="w-full px-3 py-2.5 border border-gray-300
+           rounded-md bg-white"
+>
+    <option value="">-- Escolle unha provincia --</option>
+    <option>A Coruña</option>
+    <option>Lugo</option>
+    <option>Ourense</option>
+    <option>Pontevedra</option>
+</select>
+
+    </div>
+</div>
+
+      <div class="flex justify-center gap-8">
+      <button type="submit" class="w-1/6  bg-blue-600  hover:bg-blue-800 text-white px-4 py-2 rounded-lg" :disabled="novoUsuario.dni === '' || novoUsuario.nome === ''">
         Gardar
       </button>
-    </form>
 
+      <button type="button"  class="w-1/6  bg-yellow-500  hover:bg-yellow-600 text-black px-4 py-2 rounded-lg" @click="limparForm">
+        Limpar
+      </button>
+      </div>
+    </form>
+    <div class="encabezamentoUsuarios">
+      LISTAXE DE USUARIOS —  Usuarios activos: {{ usuariosActivos }} | Inactivos:  {{ usuariosInactivos }}
+    </div>
     <h4>📋 Listaxe de usuarios</h4>
     <table v-if="usuarios.length > 0">
       <thead>
         <tr>
-          <th>ID</th>
+          <th>#</th>
           <th>DNI/CIF</th>
           <th>Nome</th>
           <th>Correo</th>
@@ -87,44 +62,33 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(u, index) in usuarios" :key="index">
+        <tr v-for="(u, index) in usuarios" :key="index"   :class="{
+       'bg-green-100': u.tipoCuenta === 'empresa',
+       'bg-yellow-100': u.tipoCuenta === 'particular'}">
           <td>{{ index + 1 }}</td>
-          <td style="text-align: center">{{ u.dni }}</td>
+          <td style="text-align: center;">{{ u.dni }}</td>
           <td>{{ u.nome }}</td>
           <td>{{ u.correo }}</td>
           <td>{{ u.provincia }}</td>
-          <td style="text-align: center">{{ u.activo ? "✅" : "❌" }}</td>
+          <td style="text-align: center;">{{ u.activo ? "✅" : "❌" }}</td>
           <td>{{ u.tipoCuenta }}</td>
-          <td style="text-align: center">
+          <td style="text-align: center;">
             <button @click="editarUsuario(index)" title="Editar">✏️</button>
             <button @click="eliminarUsuario(index)" title="Eliminar">🗑️</button>
-            <router-link
-              :to="{ name: 'xestionTarefas', params: { id: u.id } }"
-              class="btn"
-            >
-              📝 Tarefas
-            </router-link>
           </td>
         </tr>
       </tbody>
     </table>
+
     <p v-else>Non hai usuarios cargados.</p>
   </div>
 </template>
+
 <script setup>
-import { ref, reactive, onMounted } from "vue";
-import {
-  getUsuarios,
-  createUsuario,
-  updateUsuario,
-  deleteUsuario,
-} from "../services/usuarios.service.js";
-import { useUsuarioStore } from "../store/usuarioStore.js";
+/// Zona de declaracións
+import { ref, reactive, onMounted, computed } from 'vue'
 
-// Store
-const usuarioStore = useUsuarioStore();
-
-const usuarios = ref([]);
+const usuarios = ref([])  //almacena la lista de usuarios e os seus cambios
 
 const novoUsuario = reactive({
   dni: "",
@@ -132,160 +96,130 @@ const novoUsuario = reactive({
   correo: "",
   provincia: "",
   activo: false,
-  tipoCuenta: "",
-});
+  tipoCuenta: ""
+})
 
-const usuarioSeleccionado = ref(null);
-const tarefasUsuario = ref([]);
+/// Zona de ciclo de vida
 
-onMounted(() => {
-  cargarUsuarios();
-});
+onMounted(() => {       //sempre se cargan estos usuarios de exemplo ao iniciar o componente
+  usuarios.value = [
+    { dni: "A000000C", nome: "Soldaduras SL", correo: "soldadura@email.com", provincia: "A Coruña", activo: true, tipoCuenta: "empresa" },
+    { dni: "0000000C", nome: "María Pérez", correo: "maria@email.com", provincia: "Lugo", activo: false, tipoCuenta: "particular" },
+    { dni: "B1234567D", nome: "Xosé López", correo: "xose@email.com", provincia: "Ourense", activo: true, tipoCuenta: "particular" },
+    { dni: "C9876543E", nome: "Construcións Modernas", correo: "construcion@email.com", provincia: "Pontevedra", activo: true, tipoCuenta: "empresa" }
+  ]
+})
 
-// 🔹 Cargar usuarios
-async function cargarUsuarios() {
-  try {
-    const res = await getUsuarios();
-    usuarios.value = res.data;
-  } catch (error) {
-    console.error("Erro ao cargar usuarios", error);
-  }
+/// Zona de métodos ou funcións
+
+function gardarUsuario() {
+  usuarios.value.push({ ...novoUsuario })  //engade o novo usuario á lista (copia do obxecto)
+  Object.assign(novoUsuario, { dni: "", nome: "", correo: "", provincia: "", activo: false, tipoCuenta: "" }) //reinicia o formulario
 }
 
-// 🔹 Crear ou actualizar
-async function gardarUsuario() {
-  try {
-    if (usuarioSeleccionado.value) {
-      await updateUsuario(usuarioSeleccionado.value.id, {
-        ...novoUsuario,
-      });
-    } else {
-      await createUsuario(novoUsuario);
-    }
-
-    usuarioStore.seleccionarUsuario(
-      usuarioSeleccionado.value || novoUsuario
-    );
-
-    await cargarUsuarios();
-    limparFormulario();
-  } catch (error) {
-    console.error("Erro ao gardar usuario", error);
-  }
+function eliminarUsuario(index) {
+  usuarios.value.splice(index, 1);   //elimina o usuario da lista
 }
 
-// 🔹 Eliminar
-async function eliminarUsuario(index) {
-  const usuario = usuarios.value[index];
-
-  try {
-    await deleteUsuario(usuario.id);
-
-    await cargarUsuarios();
-
-    if (
-      usuarioSeleccionado.value &&
-      usuarioSeleccionado.value.id === usuario.id
-    ) {
-      limparFormulario();
-      usuarioStore.limparUsuario();
-    }
-  } catch (error) {
-    console.error("Erro ao eliminar usuario", error);
-  }
-}
-
-// 🔹 Editar
 function editarUsuario(index) {
-  const usuario = usuarios.value[index];
-
-  Object.assign(novoUsuario, usuario);
-  usuarioSeleccionado.value = usuario;
-  usuarioStore.seleccionarUsuario(usuario);
-
-  tarefasUsuario.value = [];
+  const usuario = usuarios.value[index];   //carga os datos do usuario elixido no formulario
+  Object.assign(novoUsuario, usuario);  // carga os datos do usuario no formulario recorda v-model do formulario é novoUsuario
 }
 
-// 🔹 Limpar formulario
-function limparFormulario() {
-  novoUsuario.dni = "";
-  novoUsuario.nome = "";
-  novoUsuario.correo = "";
-  novoUsuario.provincia = "";
-  novoUsuario.activo = false;
-  novoUsuario.tipoCuenta = "";
-
-  usuarioSeleccionado.value = null;
-  tarefasUsuario.value = [];
+function limparForm(){
+  Object.assign(novoUsuario, {
+    dni: "",
+    nome: "",
+    correo: "",
+    provincia: "",
+    activo: false,
+    tipoCuenta: ""
+  })
 }
+
+
+const usuariosActivos = computed(() => {
+  const resultado = usuarios.value.filter(u => u.activo).length
+  //console.log(resultado)
+  return resultado
+})
+
+const usuariosInactivos = computed(() => {
+  return usuarios.value.filter(u => !u.activo).length
+})
+
 </script>
 
 <style scoped>
-/* Mantemos todo o CSS existente */
-.xestion-usuarios {
-  width: 100; /* ancho del contenedor */
-  margin: 5px auto 2rem auto; /* 60px desde arriba para separar del navbar, centrado horizontalmente */
-  background: #fff;
-  padding: 2rem;
-  border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-.fila {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-}
 .fila-centrada {
   justify-content: center;
 }
+
 .campo {
   display: flex;
   align-items: center;
+  /* label e input en la misma línea */
   gap: 0.5rem;
+  border-radius: 0px;
 }
+
 .campo-dni {
   flex: 1;
+  /* ocupa menos espacio */
+  border-radius: 0px;
 }
+
 .campo-nome {
   flex: 3;
+  /* ocupa más espacio */
+  border-radius: 0px;
 }
+
 .campo-correo {
   flex: 2;
+  /* ocupa más espacio */
+  border-radius: 0px;
 }
-.campo-provincia {
-  flex: 1;
-}
-.campo label {
-  min-width: 80px;
-  font-weight: 500;
-}
-.campo input,
+
 .campo select {
   flex: 1;
+  padding: 0.6rem;
+  border: 1px solid #ddd;
+  border-radius: 0px;
+  width: 100%;
+}
+
+.campo-provincia {
+  flex: 1;
+  /* ocupa menos espacio */
+  border-radius: 0px;
+}
+
+.campo label {
+  min-width: 80px;
+  /* ancho fijo para alinear */
+  font-weight: 500;
+  font: bold
+}
+
+.campo input {
+  flex: 1;
+  /* ocupa todo el espacio restante */
   padding: 0.5rem;
   border: 1px solid #ddd;
   border-radius: 0px;
   box-sizing: border-box;
 }
-.btn-guardar {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.4rem 1.5rem;
-  cursor: pointer;
-  margin: 0 auto;
-  display: block;
+
+
+.inline-control {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding-right: 5rem;
 }
-.btn-guardar:hover {
-  background-color: #0056b3;
-}
+
 table {
   width: 100%;
   border-collapse: separate;
@@ -293,26 +227,40 @@ table {
   font-size: 0.8rem;
   border: 1px solid #ddd;
 }
+
 th,
 td {
   border: 1px solid #ddd;
   padding: 0.7rem;
   text-align: left;
 }
+
 th {
   text-align: center;
   background-color: #f8f9fa;
 }
+
 h4 {
   margin-bottom: 1rem;
   font-weight: 600;
   background-color: #73aff0;
   color: white;
 }
-@media (max-width: 768px) {
-  .fila {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
+
+.fila-empresa{
+  background-color: #d0f0df;
+}
+.fila-particular{
+  background-color: #ffffcc;
+}
+
+input {
+  transition: border-color 0.3s ease;
+}
+
+div.encabezamentoUsuarios{
+  background-color: #f8f8f8;
+  font-style: italic;
+  font-size: 0.9rem;
 }
 </style>

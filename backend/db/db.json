@@ -3,7 +3,7 @@
     {
       "dni": "55555555K",
       "nome": "Margarita Flor Branca",
-      "correo": "branca@mail.com",
+      "correo": "branca@gmail.com",
       "provincia": "Lugo",
       "activo": true,
       "tipoCuenta": "particular",
@@ -35,15 +35,6 @@
       "activo": true,
       "tipoCuenta": "particular",
       "id": 4
-    },
-    {
-      "dni": "00000000A",
-      "nome": "Luisa",
-      "correo": "luisa@gmail.com",
-      "provincia": "Lugo",
-      "activo": true,
-      "tipoCuenta": "empresa",
-      "id": 5
     }
   ],
   "tarefas": [
@@ -66,7 +57,7 @@
     {
       "titulo": "Reunión avaliación 2º DAM as 4 ",
       "dataLimite": "2026-01-08",
-      "completada": false,
+      "completada": true,
       "usuarioId": 1,
       "usuarioNome": "Margarita Flor Branca",
       "id": 3
@@ -82,17 +73,17 @@
     {
       "titulo": "Reunión Claustro",
       "dataLimite": "2026-04-15",
-      "completada": false,
+      "completada": true,
       "usuarioId": 1,
       "usuarioNome": "Margarita Flor Branca",
       "id": 5
     },
     {
-      "titulo": "Reunión Claustro",
-      "dataLimite": "2026-04-15",
+      "titulo": "Reunión eleccións Consello",
+      "dataLimite": "2026-04-16",
       "completada": true,
-      "usuarioId": 5,
-      "usuarioNome": "Luisa",
+      "usuarioId": 1,
+      "usuarioNome": "Margarita Flor Branca",
       "id": 6
     }
   ]

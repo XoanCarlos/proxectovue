@@ -12,7 +12,6 @@ const routes = [
   { path: '/sobrenos', name: 'sobrenos', component: SobreNos },
   { path: '/avisolegal', name: 'avisolegal', component: AvisoLegal },
   { path: "/tarefas/:id", name: "xestionTarefas", component: XestionTarefas }
-
 ]
 
 const router = createRouter({

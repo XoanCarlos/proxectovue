@@ -20,7 +20,7 @@
         required
       ></textarea>
 
-      <button type="submit">Grabar tarefa</button>
+      <button type="submit" class="bg-blue-600 text-black px-4 py-2 rounded">Grabar tarefa</button>
     </form>
 
     <!-- LISTAXE DE TAREFAS -->
@@ -124,7 +124,7 @@ async function engadirTarefa() {
   }
 }
 
-// 🔹 Completar tarefa
+// Completar tarefa
 async function completarTarefa(index) {
   const tarefa = tarefas.value[index];
 
@@ -175,14 +175,6 @@ async function completarTarefa(index) {
   width: 100%;
 }
 
-.form-tarefa button {
-  background: #007bff;
-  color: white;
-  border: none;
-  padding: 0.4rem 1rem;
-  cursor: pointer;
-  align-self: center;   /* centra o botón */
-}
 
 table {
   width: 100%;
